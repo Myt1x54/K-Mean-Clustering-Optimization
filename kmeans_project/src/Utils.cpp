@@ -71,6 +71,14 @@ AppConfig parseArguments(int argc, char* argv[]) {
         if (first == "sequential" || first == "parallel" || first == "both" || first == "optimized" || first == "all") {
             config.mode = first;
             idx = 2; // subsequent args start here
+            // If mode indicates scheduling experiments (optimized/all), allow an optional scheduling token next.
+            if (argc > 2) {
+                const std::string second(argv[2]);
+                if (second == "static" || second == "dynamic" || second == "guided") {
+                    config.schedulePolicy = second;
+                    idx = 3; // scheduling token consumed
+                }
+            }
         }
     }
 
@@ -122,6 +130,15 @@ AppConfig parseArguments(int argc, char* argv[]) {
             throw std::invalid_argument("Invalid thread count. Must be a positive integer.");
         }
         config.numThreads = nt;
+    }
+
+    // Optional schedule chunk: if present after threads, consume it
+    if (argc > idx + 8) {
+        int chunk = 0;
+        if (!parsePositiveInt(argv[idx + 8], chunk)) {
+            throw std::invalid_argument("Invalid schedule chunk. Must be a positive integer.");
+        }
+        config.scheduleChunk = chunk;
     }
 
     if (config.minCoordinate >= config.maxCoordinate) {

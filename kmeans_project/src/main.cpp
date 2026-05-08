@@ -96,7 +96,7 @@ int main(int argc, char* argv[]) {
                     config.randomSeed
                 );
                 opt.setPoints(initialPoints);
-                opt.runParallelOptimized(config.numThreads, config.ompChunkSize);
+                opt.runParallelOptimized(config.numThreads, config.ompChunkSize, config.schedulePolicy);
 
                 if (!opt.validateAssignments()) {
                     std::cerr << "Error: Invalid cluster assignments detected in optimized run.\n";
@@ -133,7 +133,7 @@ int main(int argc, char* argv[]) {
                 config.randomSeed
             );
             opt2.setPoints(initialPoints);
-            opt2.runParallelOptimized(config.numThreads, config.ompChunkSize);
+            opt2.runParallelOptimized(config.numThreads, config.ompChunkSize, config.schedulePolicy);
 
             // Compare results using accessors
             const bool centroidsEqual = KMeans::compareCentroids(seq_ref.getClusters(), opt2.getClusters(), 1e-6);

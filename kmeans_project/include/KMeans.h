@@ -3,6 +3,7 @@
 
 #include <random>
 #include <vector>
+#include <string>
 
 #include "Cluster.h"
 #include "Point.h"
@@ -20,7 +21,7 @@ public:
 
     void run();
     void runParallel(int numThreads, int chunkSize);
-    void runParallelOptimized(int numThreads, int chunkSize);
+    void runParallelOptimized(int numThreads, int chunkSize, const std::string& schedulePolicy = "static");
     void printStatistics() const;
     bool validateAssignments() const;
 

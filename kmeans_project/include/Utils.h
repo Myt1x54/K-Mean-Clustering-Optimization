@@ -20,6 +20,10 @@ struct AppConfig {
     int ompChunkSize = 1000;
     // Debug logging flag
     bool debug = false;
+    // OpenMP scheduling policy for optimized runs: static, dynamic, guided
+    std::string schedulePolicy = "static";
+    // Chunk size used with schedule(runtime)
+    int scheduleChunk = 1000;
 };
 
 AppConfig parseArguments(int argc, char* argv[]);

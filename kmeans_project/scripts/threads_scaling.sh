@@ -19,6 +19,8 @@ MAX_COORD="${MAX_COORD:-1000}"
 THRESHOLD="${THRESHOLD:-1e-4}"
 SEED="${SEED:-42}"
 REPEATS="${REPEATS:-1}"
+SCHEDULES="${SCHEDULES:-static dynamic guided}"
+CHUNK_SIZES="${CHUNK_SIZES:-1 10 100}"
 
 threads=(1 2 4 8 16)
 
@@ -43,48 +45,54 @@ stdev_from_stdin() {
 run_once() {
     local mode="$1"
     local threads_count="$2"
-    "$EXEC" "$mode" "$POINTS" "$CLUSTERS" "$MAX_ITERS" "$MIN_COORD" "$MAX_COORD" "$THRESHOLD" "$SEED" "$threads_count" 2>&1 | parse_total_runtime
+    local schedule="$3"
+    local chunk="$4"
+    "$EXEC" "$mode" "$schedule" "$POINTS" "$CLUSTERS" "$MAX_ITERS" "$MIN_COORD" "$MAX_COORD" "$THRESHOLD" "$SEED" "$threads_count" "$chunk" 2>&1 | parse_total_runtime
 }
 
-printf "implementation,threads,points,clusters,repeats,mean_time_ms,stdev_time_ms,speedup,efficiency\n" > "$OUT_CSV"
+printf "implementation,schedule,chunk_size,threads,points,clusters,repeats,mean_time_ms,stdev_time_ms,speedup,efficiency\n" > "$OUT_CSV"
 
-for t in "${threads[@]}"; do
-    echo "Running scaling test for threads=$t"
+for schedule in $SCHEDULES; do
+    for chunk in $CHUNK_SIZES; do
+        for t in "${threads[@]}"; do
+            echo "Running scaling test for schedule=$schedule chunk=$chunk threads=$t"
 
-    seq_times=()
-    naive_times=()
-    opt_times=()
+            seq_times=()
+            naive_times=()
+            opt_times=()
 
-    for ((rep = 1; rep <= REPEATS; ++rep)); do
-        seq_time="$(run_once sequential 1)"
-        naive_time="$(run_once parallel "$t")"
-        opt_time="$(run_once optimized "$t")"
+            for ((rep = 1; rep <= REPEATS; ++rep)); do
+                seq_time="$(run_once sequential 1 "$schedule" "$chunk")"
+                naive_time="$(run_once parallel "$t" "$schedule" "$chunk")"
+                opt_time="$(run_once optimized "$t" "$schedule" "$chunk")"
 
-        if [[ -z "$seq_time" || -z "$naive_time" || -z "$opt_time" ]]; then
-            echo "Failed to parse timing output for threads=$t repetition=$rep"
-            exit 1
-        fi
+                if [[ -z "$seq_time" || -z "$naive_time" || -z "$opt_time" ]]; then
+                    echo "Failed to parse timing output for schedule=$schedule chunk=$chunk threads=$t repetition=$rep"
+                    exit 1
+                fi
 
-        seq_times+=("$seq_time")
-        naive_times+=("$naive_time")
-        opt_times+=("$opt_time")
+                seq_times+=("$seq_time")
+                naive_times+=("$naive_time")
+                opt_times+=("$opt_time")
+            done
+
+            seq_mean=$(printf '%s\n' "${seq_times[@]}" | mean_from_stdin)
+            naive_mean=$(printf '%s\n' "${naive_times[@]}" | mean_from_stdin)
+            opt_mean=$(printf '%s\n' "${opt_times[@]}" | mean_from_stdin)
+
+            seq_stdev=$(printf '%s\n' "${seq_times[@]}" | stdev_from_stdin "$seq_mean")
+            naive_stdev=$(printf '%s\n' "${naive_times[@]}" | stdev_from_stdin "$naive_mean")
+            opt_stdev=$(printf '%s\n' "${opt_times[@]}" | stdev_from_stdin "$opt_mean")
+
+            for impl in "sequential:1:$seq_mean:$seq_stdev" "naive:$t:$naive_mean:$naive_stdev" "optimized:$t:$opt_mean:$opt_stdev"; do
+                IFS=':' read -r implname implthreads implmean implstdev <<< "$impl"
+                speedup=$(awk -v s="$seq_mean" -v p="$implmean" 'BEGIN{if (p > 0) printf "%.6f", s/p; else print "0.000000"}')
+                efficiency=$(awk -v sp="$speedup" -v th="$implthreads" 'BEGIN{if (th > 0) printf "%.6f", sp/th; else print "0.000000"}')
+                printf "%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s\n" "$implname" "$schedule" "$chunk" "$implthreads" "$POINTS" "$CLUSTERS" "$REPEATS" "$implmean" "$implstdev" "$speedup" "$efficiency" >> "$OUT_CSV"
+            done
+
+        done
     done
-
-    seq_mean=$(printf '%s\n' "${seq_times[@]}" | mean_from_stdin)
-    naive_mean=$(printf '%s\n' "${naive_times[@]}" | mean_from_stdin)
-    opt_mean=$(printf '%s\n' "${opt_times[@]}" | mean_from_stdin)
-
-    seq_stdev=$(printf '%s\n' "${seq_times[@]}" | stdev_from_stdin "$seq_mean")
-    naive_stdev=$(printf '%s\n' "${naive_times[@]}" | stdev_from_stdin "$naive_mean")
-    opt_stdev=$(printf '%s\n' "${opt_times[@]}" | stdev_from_stdin "$opt_mean")
-
-    for impl in "sequential:1:$seq_mean:$seq_stdev" "naive:$t:$naive_mean:$naive_stdev" "optimized:$t:$opt_mean:$opt_stdev"; do
-        IFS=':' read -r implname implthreads implmean implstdev <<< "$impl"
-        speedup=$(awk -v s="$seq_mean" -v p="$implmean" 'BEGIN{if (p > 0) printf "%.6f", s/p; else print "0.000000"}')
-        efficiency=$(awk -v sp="$speedup" -v th="$implthreads" 'BEGIN{if (th > 0) printf "%.6f", sp/th; else print "0.000000"}')
-        printf "%s,%s,%s,%s,%s,%s,%s,%s,%s\n" "$implname" "$implthreads" "$POINTS" "$CLUSTERS" "$REPEATS" "$implmean" "$implstdev" "$speedup" "$efficiency" >> "$OUT_CSV"
-    done
-
 done
 
 echo "Wrote: $OUT_CSV"

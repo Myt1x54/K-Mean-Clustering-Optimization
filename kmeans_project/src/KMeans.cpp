@@ -284,7 +284,7 @@ void KMeans::runParallel(int numThreads, int chunkSize) {
     totalRuntimeMs_ = totalTimer.elapsedMilliseconds();
 }
 
-void KMeans::runParallelOptimized(int numThreads, int chunkSize) {
+void KMeans::runParallelOptimized(int numThreads, int chunkSize, const std::string& schedulePolicy) {
 #ifdef _OPENMP
     if (numThreads > 0) {
         omp_set_num_threads(numThreads);
@@ -345,10 +345,21 @@ void KMeans::runParallelOptimized(int numThreads, int chunkSize) {
 
         int pointsReassigned = 0;
 
+        // Measure assignment & reduction phases separately for workload analysis.
+        Timer assignTimer;
+        assignTimer.start();
+
         // Parallel assignment: update only thread-local accumulators
-#ifdef _OPENMP
+        // Use runtime scheduling so we can switch between static/dynamic/guided at runtime.
+        // Configure scheduling policy for OpenMP runtime.
+    #ifdef _OPENMP
+        omp_sched_t sched_kind = omp_sched_static;
+        if (schedulePolicy == "dynamic") sched_kind = omp_sched_dynamic;
+        else if (schedulePolicy == "guided") sched_kind = omp_sched_guided;
+        omp_set_schedule(sched_kind, chunkSize);
+
         const int N = static_cast<int>(points_.size());
-        #pragma omp parallel for schedule(static, chunkSize) reduction(+:pointsReassigned)
+        #pragma omp parallel for schedule(runtime) reduction(+:pointsReassigned)
         for (int i = 0; i < N; ++i) {
             const double px = points_[static_cast<std::size_t>(i)].getX();
             const double py = points_[static_cast<std::size_t>(i)].getY();
@@ -376,12 +387,16 @@ void KMeans::runParallelOptimized(int numThreads, int chunkSize) {
             local_sum_y[idx] += py;
             local_count[idx] += 1;
         }
-#else
+    #else
         // Fallback to sequential path
         pointsReassigned = assignPointsToNearestCluster();
-#endif
+    #endif
+
+        const double assignMs = assignTimer.elapsedMilliseconds();
 
         // Reduction: merge thread-local accumulators into global cluster accumulators
+        Timer reductionTimer;
+        reductionTimer.start();
         for (int t = 0; t < T; ++t) {
             const std::size_t base = static_cast<std::size_t>(t) * Ksz;
             for (std::size_t cid = 0; cid < Ksz; ++cid) {
@@ -394,6 +409,8 @@ void KMeans::runParallelOptimized(int numThreads, int chunkSize) {
             }
         }
 
+        const double reductionMs = reductionTimer.elapsedMilliseconds();
+
         bool convergedAll = false;
         const double maxMovement = updateCentroids(convergedAll);
 
@@ -403,8 +420,10 @@ void KMeans::runParallelOptimized(int numThreads, int chunkSize) {
 
         std::cout << "Iteration " << std::setw(4) << iter
                   << " | reassigned: " << std::setw(8) << pointsReassigned
-                  << " | max movement: " << std::setw(12) << std::setprecision(6) << std::fixed << maxMovement
-                  << " | time (ms): " << std::setw(10) << std::setprecision(3) << iterationMs << "\n";
+              << " | max movement: " << std::setw(12) << std::setprecision(6) << std::fixed << maxMovement
+              << " | assign (ms): " << std::setw(8) << std::setprecision(3) << assignMs
+              << " | reduce (ms): " << std::setw(8) << std::setprecision(3) << reductionMs
+              << " | iter (ms): " << std::setw(8) << std::setprecision(3) << iterationMs << "\n";
 
         if (convergedAll) {
             converged_ = true;
