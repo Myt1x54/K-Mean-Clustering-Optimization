@@ -20,6 +20,7 @@ public:
 
     void run();
     void runParallel(int numThreads, int chunkSize);
+    void runParallelOptimized(int numThreads, int chunkSize);
     void printStatistics() const;
     bool validateAssignments() const;
 
@@ -29,6 +30,13 @@ public:
     double getTotalRuntimeMs() const;
     int getIterationsExecuted() const;
     const std::vector<double>& getIterationTimesMs() const;
+
+    // Expose clusters for verification/comparison
+    const std::vector<Cluster>& getClusters() const;
+
+    // Comparison helpers
+    static bool compareCentroids(const std::vector<Cluster>& a, const std::vector<Cluster>& b, double tol = 1e-6);
+    static bool compareAssignments(const std::vector<Point>& a, const std::vector<Point>& b);
 
 private:
     std::vector<Point> points_;

@@ -68,7 +68,7 @@ AppConfig parseArguments(int argc, char* argv[]) {
     int idx = 1;
     if (argc > 1) {
         const std::string first(argv[1]);
-        if (first == "sequential" || first == "parallel" || first == "both") {
+        if (first == "sequential" || first == "parallel" || first == "both" || first == "optimized" || first == "all") {
             config.mode = first;
             idx = 2; // subsequent args start here
         }

@@ -220,4 +220,7 @@ CMakeFiles/kmeans.dir/src/KMeans.cpp.o: \
  /home/myt1x/PDC_Project/kmeans_project/include/Timer.h \
  /usr/include/c++/11/chrono /usr/include/c++/11/ratio \
  /usr/include/c++/11/bits/parse_numbers.h \
- /usr/lib/gcc/x86_64-linux-gnu/11/include/omp.h
+ /usr/lib/gcc/x86_64-linux-gnu/11/include/omp.h \
+ /usr/include/c++/11/cstring /usr/include/string.h /usr/include/strings.h \
+ /usr/include/x86_64-linux-gnu/bits/strings_fortified.h \
+ /usr/include/x86_64-linux-gnu/bits/string_fortified.h

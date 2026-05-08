@@ -57,6 +57,12 @@ void Cluster::addPoint(double x, double y) noexcept {
     ++size_;
 }
 
+void Cluster::addAccumulated(double sumX, double sumY, int count) noexcept {
+    sumX_ += sumX;
+    sumY_ += sumY;
+    size_ += count;
+}
+
 double Cluster::updateCentroid() {
     // Empty clusters keep their previous centroid to avoid invalid division.
     if (size_ == 0) {

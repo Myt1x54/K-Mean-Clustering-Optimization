@@ -12,6 +12,8 @@
 #include <omp.h>
 #endif
 
+#include <cstring>
+
 KMeans::KMeans(int k, int maxIterations, double convergenceThreshold, unsigned int seed)
     : K_(k),
       maxIterations_(maxIterations),
@@ -282,6 +284,155 @@ void KMeans::runParallel(int numThreads, int chunkSize) {
     totalRuntimeMs_ = totalTimer.elapsedMilliseconds();
 }
 
+void KMeans::runParallelOptimized(int numThreads, int chunkSize) {
+#ifdef _OPENMP
+    if (numThreads > 0) {
+        omp_set_num_threads(numThreads);
+    }
+#else
+    (void)numThreads;
+#endif
+
+    if (points_.empty()) {
+        throw std::runtime_error("No points available. Call generateRandomPoints() or setPoints() first.");
+    }
+
+    initializeCentroids();
+
+    iterationTimesMs_.clear();
+    iterationTimesMs_.reserve(static_cast<std::size_t>(maxIterations_));
+
+    iterationsExecuted_ = 0;
+    converged_ = false;
+
+    Timer totalTimer;
+    totalTimer.start();
+
+    std::cout << "\nStarting K-Means (optimized OpenMP baseline)\n";
+    std::cout << "Points: " << points_.size() << ", Clusters: " << K_
+              << ", Max Iterations: " << maxIterations_ << "\n";
+
+#ifdef _OPENMP
+    const int usedThreads = (numThreads > 0) ? numThreads : omp_get_max_threads();
+    std::cout << "Configured threads: " << usedThreads
+              << " | OpenMP reports max threads: " << omp_get_max_threads() << "\n";
+#else
+    const int usedThreads = 1;
+    std::cout << "OpenMP not available; running single-threaded optimized version.\n";
+#endif
+
+    // Preallocate thread-local accumulators as flat arrays: [thread * K_ + cluster]
+    const int T = usedThreads;
+    const std::size_t Ksz = static_cast<std::size_t>(K_);
+
+    std::vector<double> local_sum_x(static_cast<std::size_t>(T) * Ksz);
+    std::vector<double> local_sum_y(static_cast<std::size_t>(T) * Ksz);
+    std::vector<int> local_count(static_cast<std::size_t>(T) * Ksz);
+
+    for (int iter = 1; iter <= maxIterations_; ++iter) {
+        Timer iterationTimer;
+        iterationTimer.start();
+
+        // Reset global cluster accumulators
+        for (Cluster& cluster : clusters_) {
+            cluster.resetAccumulators();
+        }
+
+        // Reset local accumulators
+        std::fill(local_sum_x.begin(), local_sum_x.end(), 0.0);
+        std::fill(local_sum_y.begin(), local_sum_y.end(), 0.0);
+        std::fill(local_count.begin(), local_count.end(), 0);
+
+        int pointsReassigned = 0;
+
+        // Parallel assignment: update only thread-local accumulators
+#ifdef _OPENMP
+        const int N = static_cast<int>(points_.size());
+        #pragma omp parallel for schedule(static, chunkSize) reduction(+:pointsReassigned)
+        for (int i = 0; i < N; ++i) {
+            const double px = points_[static_cast<std::size_t>(i)].getX();
+            const double py = points_[static_cast<std::size_t>(i)].getY();
+
+            int bestClusterId = 0;
+            double bestDistance = computeEuclideanDistance(
+                px, py, clusters_[0].getCentroidX(), clusters_[0].getCentroidY());
+
+            for (int cid = 1; cid < K_; ++cid) {
+                const double d = computeEuclideanDistance(px, py, clusters_[cid].getCentroidX(), clusters_[cid].getCentroidY());
+                if (d < bestDistance) {
+                    bestDistance = d;
+                    bestClusterId = cid;
+                }
+            }
+
+            if (points_[static_cast<std::size_t>(i)].getClusterId() != bestClusterId) {
+                pointsReassigned++;
+                points_[static_cast<std::size_t>(i)].setClusterId(bestClusterId);
+            }
+
+            const int tid = omp_get_thread_num();
+            const std::size_t idx = static_cast<std::size_t>(tid) * Ksz + static_cast<std::size_t>(bestClusterId);
+            local_sum_x[idx] += px;
+            local_sum_y[idx] += py;
+            local_count[idx] += 1;
+        }
+#else
+        // Fallback to sequential path
+        pointsReassigned = assignPointsToNearestCluster();
+#endif
+
+        // Reduction: merge thread-local accumulators into global cluster accumulators
+        for (int t = 0; t < T; ++t) {
+            const std::size_t base = static_cast<std::size_t>(t) * Ksz;
+            for (std::size_t cid = 0; cid < Ksz; ++cid) {
+                const double sx = local_sum_x[base + cid];
+                const double sy = local_sum_y[base + cid];
+                const int cnt = local_count[base + cid];
+                if (cnt != 0) {
+                    clusters_[static_cast<int>(cid)].addAccumulated(sx, sy, cnt);
+                }
+            }
+        }
+
+        bool convergedAll = false;
+        const double maxMovement = updateCentroids(convergedAll);
+
+        const double iterationMs = iterationTimer.elapsedMilliseconds();
+        iterationTimesMs_.push_back(iterationMs);
+        iterationsExecuted_ = iter;
+
+        std::cout << "Iteration " << std::setw(4) << iter
+                  << " | reassigned: " << std::setw(8) << pointsReassigned
+                  << " | max movement: " << std::setw(12) << std::setprecision(6) << std::fixed << maxMovement
+                  << " | time (ms): " << std::setw(10) << std::setprecision(3) << iterationMs << "\n";
+
+        if (convergedAll) {
+            converged_ = true;
+            break;
+        }
+    }
+
+    totalRuntimeMs_ = totalTimer.elapsedMilliseconds();
+}
+
+bool KMeans::compareCentroids(const std::vector<Cluster>& a, const std::vector<Cluster>& b, double tol) {
+    if (a.size() != b.size()) return false;
+    for (std::size_t i = 0; i < a.size(); ++i) {
+        const double dx = a[i].getCentroidX() - b[i].getCentroidX();
+        const double dy = a[i].getCentroidY() - b[i].getCentroidY();
+        if (std::sqrt(dx*dx + dy*dy) > tol) return false;
+    }
+    return true;
+}
+
+bool KMeans::compareAssignments(const std::vector<Point>& a, const std::vector<Point>& b) {
+    if (a.size() != b.size()) return false;
+    for (std::size_t i = 0; i < a.size(); ++i) {
+        if (a[i].getClusterId() != b[i].getClusterId()) return false;
+    }
+    return true;
+}
+
 const std::vector<Point>& KMeans::getPoints() const { return points_; }
 
 void KMeans::setPoints(const std::vector<Point>& pts) { points_ = pts; }
@@ -291,6 +442,8 @@ double KMeans::getTotalRuntimeMs() const { return totalRuntimeMs_; }
 int KMeans::getIterationsExecuted() const { return iterationsExecuted_; }
 
 const std::vector<double>& KMeans::getIterationTimesMs() const { return iterationTimesMs_; }
+
+const std::vector<Cluster>& KMeans::getClusters() const { return clusters_; }
 
 void KMeans::printStatistics() const {
     double averageIterationMs = 0.0;

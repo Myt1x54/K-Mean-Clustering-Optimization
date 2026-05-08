@@ -129,6 +129,29 @@ Run quick benchmark smoke suite:
 ./scripts/benchmark_quick.sh
 ```
 
+Run the thread-scaling harness with optional repeated trials and mean/stdev aggregation:
+
+```bash
+REPEATS=5 POINTS=50000 CLUSTERS=8 MAX_ITERS=80 ./scripts/threads_scaling.sh
+```
+
+Supported environment overrides:
+- `REPEATS`: number of runs per case, default `1`
+- `POINTS`: dataset size, default `100000`
+- `CLUSTERS`: number of clusters, default `8`
+- `MAX_ITERS`: maximum iterations, default `100`
+
+The CSV output includes:
+- `implementation`
+- `threads`
+- `points`
+- `clusters`
+- `repeats`
+- `mean_time_ms`
+- `stdev_time_ms`
+- `speedup`
+- `efficiency`
+
 Determinism settings used by scripts:
 - fixed seed: `42`
 - coordinate range: `[0, 1000]`

@@ -16,6 +16,10 @@ public:
     void resetAccumulators() noexcept;
     void addPoint(double x, double y) noexcept;
 
+    // Add aggregated values produced by a thread-local accumulator during reduction.
+    // This allows efficient merging without per-point calls inside the hot loop.
+    void addAccumulated(double sumX, double sumY, int count) noexcept;
+
     // Updates the centroid using current accumulators and returns movement magnitude.
     double updateCentroid();
 
