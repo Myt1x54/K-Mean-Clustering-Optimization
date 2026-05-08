@@ -1,0 +1,182 @@
+\n=== Quick Benchmark: N=20000 K=8 I=80 ===
+
+Starting K-Means (sequential baseline)
+Points: 20000, Clusters: 8, Max Iterations: 80
+
+Iteration    1 | reassigned:    20000 | max movement:   170.650152 | time (ms):      0.654
+Iteration    2 | reassigned:     2985 | max movement:    56.187848 | time (ms):      1.045
+Iteration    3 | reassigned:     1785 | max movement:    44.157480 | time (ms):      1.377
+Iteration    4 | reassigned:     1230 | max movement:    31.665645 | time (ms):      0.610
+Iteration    5 | reassigned:      866 | max movement:    24.335631 | time (ms):      0.657
+Iteration    6 | reassigned:      662 | max movement:    17.359571 | time (ms):      0.584
+Iteration    7 | reassigned:      514 | max movement:    13.087883 | time (ms):      0.581
+Iteration    8 | reassigned:      413 | max movement:     9.658150 | time (ms):      0.717
+Iteration    9 | reassigned:      320 | max movement:     8.813043 | time (ms):      0.640
+Iteration   10 | reassigned:      229 | max movement:     6.739098 | time (ms):      0.577
+Iteration   11 | reassigned:      192 | max movement:     6.041971 | time (ms):      0.627
+Iteration   12 | reassigned:      147 | max movement:     4.774809 | time (ms):      0.591
+Iteration   13 | reassigned:      126 | max movement:     3.867037 | time (ms):      0.574
+Iteration   14 | reassigned:      101 | max movement:     3.311103 | time (ms):      0.585
+Iteration   15 | reassigned:       93 | max movement:     3.507484 | time (ms):      0.597
+Iteration   16 | reassigned:       83 | max movement:     3.165328 | time (ms):      0.667
+Iteration   17 | reassigned:       57 | max movement:     1.994029 | time (ms):      0.619
+Iteration   18 | reassigned:       45 | max movement:     1.961432 | time (ms):      0.574
+Iteration   19 | reassigned:       44 | max movement:     2.061945 | time (ms):      0.574
+Iteration   20 | reassigned:       35 | max movement:     1.589254 | time (ms):      0.573
+Iteration   21 | reassigned:       30 | max movement:     1.326777 | time (ms):      0.583
+Iteration   22 | reassigned:       26 | max movement:     1.033625 | time (ms):      0.583
+Iteration   23 | reassigned:       28 | max movement:     1.142444 | time (ms):      0.573
+Iteration   24 | reassigned:       15 | max movement:     0.477020 | time (ms):      0.621
+Iteration   25 | reassigned:       11 | max movement:     0.352340 | time (ms):      0.716
+Iteration   26 | reassigned:        4 | max movement:     0.185994 | time (ms):      0.621
+Iteration   27 | reassigned:        2 | max movement:     0.091014 | time (ms):      0.618
+Iteration   28 | reassigned:        2 | max movement:     0.193798 | time (ms):      0.585
+Iteration   29 | reassigned:        1 | max movement:     0.076167 | time (ms):      0.567
+Iteration   30 | reassigned:        0 | max movement:     0.000000 | time (ms):      0.559
+
+===== Final Statistics =====
+Total points:         20000
+Total clusters:       8
+Iterations executed:  30
+Total runtime (ms):   19.633
+Avg iteration (ms):   0.648
+Converged:            Yes
+
+Cluster sizes:
+  Cluster 0: 2509 points
+  Cluster 1: 2312 points
+  Cluster 2: 2246 points
+  Cluster 3: 2813 points
+  Cluster 4: 2603 points
+  Cluster 5: 2368 points
+  Cluster 6: 2419 points
+  Cluster 7: 2730 points
+============================
+\n=== Quick Benchmark: N=50000 K=12 I=120 ===
+
+Starting K-Means (sequential baseline)
+Points: 50000, Clusters: 12, Max Iterations: 120
+
+Iteration    1 | reassigned:    50000 | max movement:   156.243056 | time (ms):      2.319
+Iteration    2 | reassigned:     8128 | max movement:    73.550153 | time (ms):      2.282
+Iteration    3 | reassigned:     4695 | max movement:    49.432448 | time (ms):      2.104
+Iteration    4 | reassigned:     3127 | max movement:    32.647099 | time (ms):      2.212
+Iteration    5 | reassigned:     2209 | max movement:    21.842149 | time (ms):      2.287
+Iteration    6 | reassigned:     1506 | max movement:    16.932192 | time (ms):      2.084
+Iteration    7 | reassigned:     1202 | max movement:    13.120261 | time (ms):      2.052
+Iteration    8 | reassigned:     1021 | max movement:    10.463569 | time (ms):      2.082
+Iteration    9 | reassigned:      937 | max movement:     9.659021 | time (ms):      2.090
+Iteration   10 | reassigned:      816 | max movement:     9.591984 | time (ms):      2.004
+Iteration   11 | reassigned:      775 | max movement:     9.113249 | time (ms):      2.297
+Iteration   12 | reassigned:      779 | max movement:     8.360600 | time (ms):      2.047
+Iteration   13 | reassigned:      749 | max movement:     8.526912 | time (ms):      2.169
+Iteration   14 | reassigned:      820 | max movement:    10.060737 | time (ms):      2.145
+Iteration   15 | reassigned:      849 | max movement:    11.306450 | time (ms):      2.314
+Iteration   16 | reassigned:      798 | max movement:    10.048746 | time (ms):      2.136
+Iteration   17 | reassigned:      736 | max movement:     9.613276 | time (ms):      2.134
+Iteration   18 | reassigned:      681 | max movement:     9.665194 | time (ms):      2.112
+Iteration   19 | reassigned:      591 | max movement:     8.326694 | time (ms):      2.193
+Iteration   20 | reassigned:      545 | max movement:     7.842664 | time (ms):      2.215
+Iteration   21 | reassigned:      504 | max movement:     6.648824 | time (ms):      2.153
+Iteration   22 | reassigned:      422 | max movement:     5.446662 | time (ms):      2.120
+Iteration   23 | reassigned:      432 | max movement:     6.156840 | time (ms):      2.169
+Iteration   24 | reassigned:      426 | max movement:     5.776632 | time (ms):      2.370
+Iteration   25 | reassigned:      446 | max movement:     5.670677 | time (ms):      2.132
+Iteration   26 | reassigned:      406 | max movement:     5.051870 | time (ms):      2.145
+Iteration   27 | reassigned:      401 | max movement:     4.510585 | time (ms):      2.093
+Iteration   28 | reassigned:      413 | max movement:     5.157507 | time (ms):      2.167
+Iteration   29 | reassigned:      399 | max movement:     4.663148 | time (ms):      2.126
+Iteration   30 | reassigned:      408 | max movement:     5.471572 | time (ms):      2.163
+Iteration   31 | reassigned:      401 | max movement:     5.198594 | time (ms):      2.433
+Iteration   32 | reassigned:      410 | max movement:     5.282415 | time (ms):      3.991
+Iteration   33 | reassigned:      440 | max movement:     4.863014 | time (ms):      2.732
+Iteration   34 | reassigned:      361 | max movement:     4.592778 | time (ms):      2.210
+Iteration   35 | reassigned:      379 | max movement:     4.887626 | time (ms):      2.174
+Iteration   36 | reassigned:      385 | max movement:     5.288204 | time (ms):      2.106
+Iteration   37 | reassigned:      367 | max movement:     5.630753 | time (ms):      2.169
+Iteration   38 | reassigned:      340 | max movement:     5.336454 | time (ms):      2.192
+Iteration   39 | reassigned:      329 | max movement:     4.930678 | time (ms):      2.162
+Iteration   40 | reassigned:      317 | max movement:     4.196905 | time (ms):      2.072
+Iteration   41 | reassigned:      298 | max movement:     3.827615 | time (ms):      2.104
+Iteration   42 | reassigned:      268 | max movement:     3.311148 | time (ms):      2.170
+Iteration   43 | reassigned:      229 | max movement:     2.720025 | time (ms):      2.313
+Iteration   44 | reassigned:      216 | max movement:     2.863065 | time (ms):      2.210
+Iteration   45 | reassigned:      194 | max movement:     2.741683 | time (ms):      2.089
+Iteration   46 | reassigned:      159 | max movement:     2.241863 | time (ms):      2.226
+Iteration   47 | reassigned:      152 | max movement:     2.012016 | time (ms):      2.166
+Iteration   48 | reassigned:      148 | max movement:     2.165795 | time (ms):      2.075
+Iteration   49 | reassigned:      114 | max movement:     1.743890 | time (ms):      2.108
+Iteration   50 | reassigned:       99 | max movement:     1.383453 | time (ms):      2.186
+Iteration   51 | reassigned:       99 | max movement:     1.448574 | time (ms):      2.123
+Iteration   52 | reassigned:       82 | max movement:     1.379962 | time (ms):      2.167
+Iteration   53 | reassigned:       66 | max movement:     1.011442 | time (ms):      2.301
+Iteration   54 | reassigned:       67 | max movement:     1.054527 | time (ms):      2.227
+Iteration   55 | reassigned:       65 | max movement:     1.017632 | time (ms):      2.123
+Iteration   56 | reassigned:       35 | max movement:     0.517737 | time (ms):      2.198
+Iteration   57 | reassigned:       33 | max movement:     0.537196 | time (ms):      2.209
+Iteration   58 | reassigned:       30 | max movement:     0.532566 | time (ms):      2.299
+Iteration   59 | reassigned:       28 | max movement:     0.430378 | time (ms):      2.280
+Iteration   60 | reassigned:       24 | max movement:     0.483998 | time (ms):      2.278
+Iteration   61 | reassigned:       17 | max movement:     0.433042 | time (ms):      2.318
+Iteration   62 | reassigned:       12 | max movement:     0.328696 | time (ms):      2.301
+Iteration   63 | reassigned:       13 | max movement:     0.253038 | time (ms):      2.134
+Iteration   64 | reassigned:        7 | max movement:     0.180530 | time (ms):      2.153
+Iteration   65 | reassigned:        6 | max movement:     0.200500 | time (ms):      2.202
+Iteration   66 | reassigned:        5 | max movement:     0.188376 | time (ms):      2.141
+Iteration   67 | reassigned:        8 | max movement:     0.217300 | time (ms):      2.170
+Iteration   68 | reassigned:        9 | max movement:     0.207633 | time (ms):      2.260
+Iteration   69 | reassigned:        7 | max movement:     0.218009 | time (ms):      2.129
+Iteration   70 | reassigned:        7 | max movement:     0.186401 | time (ms):      2.133
+Iteration   71 | reassigned:        7 | max movement:     0.152942 | time (ms):      2.199
+Iteration   72 | reassigned:        5 | max movement:     0.113044 | time (ms):      2.128
+Iteration   73 | reassigned:        4 | max movement:     0.122234 | time (ms):      2.167
+Iteration   74 | reassigned:        5 | max movement:     0.152429 | time (ms):      2.180
+Iteration   75 | reassigned:        6 | max movement:     0.127948 | time (ms):      2.115
+Iteration   76 | reassigned:        6 | max movement:     0.118105 | time (ms):      2.394
+Iteration   77 | reassigned:        9 | max movement:     0.188048 | time (ms):      2.135
+Iteration   78 | reassigned:       10 | max movement:     0.277825 | time (ms):      2.129
+Iteration   79 | reassigned:       12 | max movement:     0.274792 | time (ms):      2.177
+Iteration   80 | reassigned:        8 | max movement:     0.131932 | time (ms):      2.163
+Iteration   81 | reassigned:        6 | max movement:     0.122219 | time (ms):      2.136
+Iteration   82 | reassigned:        3 | max movement:     0.115880 | time (ms):      2.120
+Iteration   83 | reassigned:        6 | max movement:     0.171019 | time (ms):      2.205
+Iteration   84 | reassigned:        6 | max movement:     0.194242 | time (ms):      2.305
+Iteration   85 | reassigned:        8 | max movement:     0.263018 | time (ms):      2.213
+Iteration   86 | reassigned:       12 | max movement:     0.358346 | time (ms):      2.117
+Iteration   87 | reassigned:       14 | max movement:     0.306920 | time (ms):      2.150
+Iteration   88 | reassigned:       13 | max movement:     0.212556 | time (ms):      2.146
+Iteration   89 | reassigned:       19 | max movement:     0.395951 | time (ms):      2.162
+Iteration   90 | reassigned:       17 | max movement:     0.401599 | time (ms):      2.144
+Iteration   91 | reassigned:       20 | max movement:     0.383018 | time (ms):      2.264
+Iteration   92 | reassigned:       18 | max movement:     0.298344 | time (ms):      2.197
+Iteration   93 | reassigned:       16 | max movement:     0.371471 | time (ms):      2.144
+Iteration   94 | reassigned:       18 | max movement:     0.258715 | time (ms):      2.146
+Iteration   95 | reassigned:        8 | max movement:     0.156869 | time (ms):      2.168
+Iteration   96 | reassigned:        4 | max movement:     0.089133 | time (ms):      2.126
+Iteration   97 | reassigned:        6 | max movement:     0.077538 | time (ms):      2.140
+Iteration   98 | reassigned:        6 | max movement:     0.129416 | time (ms):      2.123
+Iteration   99 | reassigned:        2 | max movement:     0.048385 | time (ms):      2.462
+Iteration  100 | reassigned:        0 | max movement:     0.000000 | time (ms):      2.120
+
+===== Final Statistics =====
+Total points:         50000
+Total clusters:       12
+Iterations executed:  100
+Total runtime (ms):   221.328
+Avg iteration (ms):   2.203
+Converged:            Yes
+
+Cluster sizes:
+  Cluster 0: 3690 points
+  Cluster 1: 4207 points
+  Cluster 2: 3415 points
+  Cluster 3: 5092 points
+  Cluster 4: 3968 points
+  Cluster 5: 4138 points
+  Cluster 6: 4367 points
+  Cluster 7: 4806 points
+  Cluster 8: 3595 points
+  Cluster 9: 4231 points
+  Cluster 10: 4357 points
+  Cluster 11: 4134 points
+============================
