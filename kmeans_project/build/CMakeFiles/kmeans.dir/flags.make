@@ -6,5 +6,5 @@ CXX_DEFINES =
 
 CXX_INCLUDES = -I/home/myt1x/PDC_Project/kmeans_project/include
 
-CXX_FLAGS = -O3 -DNDEBUG -Wall -Wextra -Wpedantic -std=c++17
+CXX_FLAGS = -O3 -DNDEBUG -O3 -Wall -Wextra -Wpedantic -fopenmp -std=c++17
 

@@ -19,8 +19,16 @@ public:
     double updateCentroids(bool& convergedAll);
 
     void run();
+    void runParallel(int numThreads, int chunkSize);
     void printStatistics() const;
     bool validateAssignments() const;
+
+    // Accessors for external benchmarking and comparison
+    const std::vector<Point>& getPoints() const;
+    void setPoints(const std::vector<Point>& pts);
+    double getTotalRuntimeMs() const;
+    int getIterationsExecuted() const;
+    const std::vector<double>& getIterationTimesMs() const;
 
 private:
     std::vector<Point> points_;

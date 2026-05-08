@@ -189,4 +189,5 @@ CMakeFiles/kmeans.dir/src/main.cpp.o: \
  /home/myt1x/PDC_Project/kmeans_project/include/Cluster.h \
  /home/myt1x/PDC_Project/kmeans_project/include/Point.h \
  /home/myt1x/PDC_Project/kmeans_project/include/Utils.h \
- /usr/include/c++/11/cstddef
+ /usr/include/c++/11/cstddef \
+ /usr/lib/gcc/x86_64-linux-gnu/11/include/omp.h

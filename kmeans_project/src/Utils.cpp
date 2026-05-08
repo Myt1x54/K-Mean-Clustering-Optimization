@@ -60,46 +60,68 @@ bool parseUnsignedInt(const char* text, unsigned int& outValue) {
 AppConfig parseArguments(int argc, char* argv[]) {
     AppConfig config;
 
+    // Flexible argument parsing to support an optional mode string first.
+    // Usage patterns supported:
+    // 1) ./kmeans sequential|parallel|both [N] [K] [maxIters] [min] [max] [threshold] [seed] [threads]
+    // 2) ./kmeans N K maxIters [min] [max] [threshold] [seed] [threads]
+
+    int idx = 1;
     if (argc > 1) {
-        if (!parsePositiveSizeT(argv[1], config.numPoints)) {
+        const std::string first(argv[1]);
+        if (first == "sequential" || first == "parallel" || first == "both") {
+            config.mode = first;
+            idx = 2; // subsequent args start here
+        }
+    }
+
+    if (argc > idx) {
+        if (!parsePositiveSizeT(argv[idx], config.numPoints)) {
             throw std::invalid_argument("Invalid number of points. Must be a positive integer.");
         }
     }
 
-    if (argc > 2) {
-        if (!parsePositiveInt(argv[2], config.numClusters)) {
+    if (argc > idx + 1) {
+        if (!parsePositiveInt(argv[idx + 1], config.numClusters)) {
             throw std::invalid_argument("Invalid number of clusters. Must be a positive integer.");
         }
     }
 
-    if (argc > 3) {
-        if (!parsePositiveInt(argv[3], config.maxIterations)) {
+    if (argc > idx + 2) {
+        if (!parsePositiveInt(argv[idx + 2], config.maxIterations)) {
             throw std::invalid_argument("Invalid max iterations. Must be a positive integer.");
         }
     }
 
-    if (argc > 4) {
-        if (!parseDouble(argv[4], config.minCoordinate)) {
+    if (argc > idx + 3) {
+        if (!parseDouble(argv[idx + 3], config.minCoordinate)) {
             throw std::invalid_argument("Invalid min coordinate. Must be numeric.");
         }
     }
 
-    if (argc > 5) {
-        if (!parseDouble(argv[5], config.maxCoordinate)) {
+    if (argc > idx + 4) {
+        if (!parseDouble(argv[idx + 4], config.maxCoordinate)) {
             throw std::invalid_argument("Invalid max coordinate. Must be numeric.");
         }
     }
 
-    if (argc > 6) {
-        if (!parseDouble(argv[6], config.convergenceThreshold) || config.convergenceThreshold <= 0.0) {
+    if (argc > idx + 5) {
+        if (!parseDouble(argv[idx + 5], config.convergenceThreshold) || config.convergenceThreshold <= 0.0) {
             throw std::invalid_argument("Invalid convergence threshold. Must be > 0.");
         }
     }
 
-    if (argc > 7) {
-        if (!parseUnsignedInt(argv[7], config.randomSeed)) {
+    if (argc > idx + 6) {
+        if (!parseUnsignedInt(argv[idx + 6], config.randomSeed)) {
             throw std::invalid_argument("Invalid seed. Must be an unsigned integer.");
         }
+    }
+
+    if (argc > idx + 7) {
+        int nt = 0;
+        if (!parsePositiveInt(argv[idx + 7], nt)) {
+            throw std::invalid_argument("Invalid thread count. Must be a positive integer.");
+        }
+        config.numThreads = nt;
     }
 
     if (config.minCoordinate >= config.maxCoordinate) {

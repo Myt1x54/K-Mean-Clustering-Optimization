@@ -10,6 +10,11 @@ if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release CACHE STRING "Build type" FORCE)
 endif()
 
+# Prefer -O3 for optimization in research builds. OpenMP will be enabled when found.
+if(CMAKE_BUILD_TYPE MATCHES "Release")
+    add_compile_options(-O3)
+endif()
+
 add_executable(kmeans
     src/main.cpp
     src/Point.cpp
@@ -26,6 +31,11 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
     target_compile_options(kmeans PRIVATE -Wall -Wextra -Wpedantic)
 endif()
 
-# Future OpenMP integration can be enabled with:
-# find_package(OpenMP REQUIRED)
-# target_link_libraries(kmeans PRIVATE OpenMP::OpenMP_CXX)
+# Enable OpenMP if available and link the target. This adds -fopenmp where needed.
+find_package(OpenMP)
+if(OpenMP_CXX_FOUND)
+    message(STATUS "Found OpenMP: enabling OpenMP for kmeans target")
+    target_link_libraries(kmeans PRIVATE OpenMP::OpenMP_CXX)
+else()
+    message(STATUS "OpenMP not found; building without OpenMP")
+endif()

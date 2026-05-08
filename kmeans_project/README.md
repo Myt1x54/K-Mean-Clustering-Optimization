@@ -133,3 +133,42 @@ Determinism settings used by scripts:
 - fixed seed: `42`
 - coordinate range: `[0, 1000]`
 - convergence threshold: `1e-4`
+
+## OpenMP Parallel (Naive) Integration
+
+This repository includes a naive OpenMP parallel implementation that reproduces the synchronization strategy from the paper "Algoritmo K-Means: versione sequenziale e versione parallela".
+
+Key points:
+- The parallel implementation only parallelizes the outer point-assignment loop using `#pragma omp parallel` / `#pragma omp for`.
+- Shared cluster accumulators are updated inside `#pragma omp critical` to reproduce the lock contention bottleneck from the paper (no reductions or thread-local accumulators yet).
+- Static scheduling with a chunk size of `1000` is used by default; the chunk size can be configured via command-line.
+
+Build with OpenMP enabled (CMake will link OpenMP if available):
+
+```bash
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+cmake --build build -j
+```
+
+Run modes:
+- `sequential`: run the sequential implementation
+- `parallel`: run the naive OpenMP implementation
+- `both`: run sequential then parallel and report speedup/efficiency
+
+Examples:
+
+```bash
+# sequential with defaults
+./build/kmeans sequential 100000 20 100
+
+# parallel with 8 threads
+./build/kmeans parallel 100000 20 100 0 1000 1e-4 42 8
+
+# run both sequential and parallel for direct comparison
+./build/kmeans both 100000 20 100 0 1000 1e-4 42 8
+```
+
+Why the critical section is intentional:
+- The paper describes a naive approach that updates shared centroids under a global lock, which creates a synchronization bottleneck as thread count increases.
+- We intentionally preserve that behavior to provide a clear baseline for later optimizations (thread-local accumulators, reductions, scheduling experiments).
+

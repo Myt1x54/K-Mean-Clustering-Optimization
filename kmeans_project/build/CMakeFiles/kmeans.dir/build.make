@@ -172,6 +172,8 @@ kmeans: CMakeFiles/kmeans.dir/src/KMeans.cpp.o
 kmeans: CMakeFiles/kmeans.dir/src/Timer.cpp.o
 kmeans: CMakeFiles/kmeans.dir/src/Utils.cpp.o
 kmeans: CMakeFiles/kmeans.dir/build.make
+kmeans: /usr/lib/gcc/x86_64-linux-gnu/11/libgomp.so
+kmeans: /usr/lib/x86_64-linux-gnu/libpthread.a
 kmeans: CMakeFiles/kmeans.dir/link.txt
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/myt1x/PDC_Project/kmeans_project/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Linking CXX executable kmeans"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/kmeans.dir/link.txt --verbose=$(VERBOSE)

@@ -8,6 +8,9 @@
 #include <stdexcept>
 
 #include "Timer.h"
+#ifdef _OPENMP
+#include <omp.h>
+#endif
 
 KMeans::KMeans(int k, int maxIterations, double convergenceThreshold, unsigned int seed)
     : K_(k),
@@ -168,6 +171,126 @@ void KMeans::run() {
 
     totalRuntimeMs_ = totalTimer.elapsedMilliseconds();
 }
+
+void KMeans::runParallel(int numThreads, int chunkSize) {
+#ifdef _OPENMP
+    if (numThreads > 0) {
+        omp_set_num_threads(numThreads);
+    }
+#else
+    (void)numThreads;
+#endif
+
+    if (points_.empty()) {
+        throw std::runtime_error("No points available. Call generateRandomPoints() or setPoints() first.");
+    }
+
+    initializeCentroids();
+
+    iterationTimesMs_.clear();
+    iterationTimesMs_.reserve(static_cast<std::size_t>(maxIterations_));
+
+    iterationsExecuted_ = 0;
+    converged_ = false;
+
+    Timer totalTimer;
+    totalTimer.start();
+
+    std::cout << "\nStarting K-Means (naive OpenMP baseline)\n";
+    std::cout << "Points: " << points_.size() << ", Clusters: " << K_
+              << ", Max Iterations: " << maxIterations_ << "\n";
+
+#ifdef _OPENMP
+    std::cout << "Configured threads: " << numThreads
+              << " | OpenMP reports max threads: " << omp_get_max_threads() << "\n";
+#else
+    std::cout << "OpenMP not available in this build; running sequentially.\n";
+#endif
+
+    for (int iter = 1; iter <= maxIterations_; ++iter) {
+        Timer iterationTimer;
+        iterationTimer.start();
+
+        for (Cluster& cluster : clusters_) {
+            cluster.resetAccumulators();
+        }
+
+        // Naive parallel assignment: each thread finds nearest cluster for its points
+        // and updates the shared cluster accumulators inside a critical section.
+        // This reproduces the synchronization bottleneck described in the paper.
+        int pointsReassigned = 0;
+
+#ifdef _OPENMP
+        const int N = static_cast<int>(points_.size());
+        #pragma omp parallel
+        {
+            int localReassigned = 0;
+            #pragma omp for schedule(static, chunkSize)
+            for (int i = 0; i < N; ++i) {
+                double px = points_[static_cast<std::size_t>(i)].getX();
+                double py = points_[static_cast<std::size_t>(i)].getY();
+
+                int bestClusterId = 0;
+                double bestDistance = computeEuclideanDistance(
+                    px, py, clusters_[0].getCentroidX(), clusters_[0].getCentroidY());
+
+                for (int cid = 1; cid < K_; ++cid) {
+                    const double d = computeEuclideanDistance(px, py, clusters_[cid].getCentroidX(), clusters_[cid].getCentroidY());
+                    if (d < bestDistance) {
+                        bestDistance = d;
+                        bestClusterId = cid;
+                    }
+                }
+
+                if (points_[static_cast<std::size_t>(i)].getClusterId() != bestClusterId) {
+                    localReassigned++;
+                    points_[static_cast<std::size_t>(i)].setClusterId(bestClusterId);
+                }
+
+                // Critical section to protect shared cluster accumulators per paper.
+                #pragma omp critical
+                {
+                    clusters_[bestClusterId].addPoint(px, py);
+                }
+            }
+            #pragma omp atomic
+            pointsReassigned += localReassigned;
+        }
+#else
+        // If OpenMP not available, fall back to sequential assignment.
+        pointsReassigned = assignPointsToNearestCluster();
+#endif
+
+        bool convergedAll = false;
+        const double maxMovement = updateCentroids(convergedAll);
+
+        const double iterationMs = iterationTimer.elapsedMilliseconds();
+        iterationTimesMs_.push_back(iterationMs);
+        iterationsExecuted_ = iter;
+
+        std::cout << "Iteration " << std::setw(4) << iter
+                  << " | reassigned: " << std::setw(8) << pointsReassigned
+                  << " | max movement: " << std::setw(12) << std::setprecision(6) << std::fixed << maxMovement
+                  << " | time (ms): " << std::setw(10) << std::setprecision(3) << iterationMs << "\n";
+
+        if (convergedAll) {
+            converged_ = true;
+            break;
+        }
+    }
+
+    totalRuntimeMs_ = totalTimer.elapsedMilliseconds();
+}
+
+const std::vector<Point>& KMeans::getPoints() const { return points_; }
+
+void KMeans::setPoints(const std::vector<Point>& pts) { points_ = pts; }
+
+double KMeans::getTotalRuntimeMs() const { return totalRuntimeMs_; }
+
+int KMeans::getIterationsExecuted() const { return iterationsExecuted_; }
+
+const std::vector<double>& KMeans::getIterationTimesMs() const { return iterationTimesMs_; }
 
 void KMeans::printStatistics() const {
     double averageIterationMs = 0.0;
