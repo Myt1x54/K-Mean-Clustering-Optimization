@@ -195,3 +195,170 @@ Why the critical section is intentional:
 - The paper describes a naive approach that updates shared centroids under a global lock, which creates a synchronization bottleneck as thread count increases.
 - We intentionally preserve that behavior to provide a clear baseline for later optimizations (thread-local accumulators, reductions, scheduling experiments).
 
+## OpenMP Optimized (Thread-Local Accumulators)
+
+The optimized OpenMP implementation removes the critical section bottleneck using thread-local accumulators and parallel reduction:
+
+Key features:
+- Pre-allocate flat arrays: `[thread_id * K + cluster_id]` for sumX, sumY, count
+- Each thread accumulates into its own region during parallel point-assignment
+- Sequential reduction phase merges thread-local accumulators into global clusters
+- Eliminates lock contention entirely
+
+Run optimized implementation:
+
+```bash
+# Basic optimized run (default static scheduling)
+./build/kmeans optimized 100000 20 100 0 1000 1e-4 42 8
+
+# Optimized with dynamic scheduling
+./build/kmeans optimized dynamic 100000 20 100 0 1000 1e-4 42 8
+
+# Optimized with guided scheduling
+./build/kmeans optimized guided 100000 20 100 0 1000 1e-4 42 8 1000
+```
+
+Argument structure: `./build/kmeans optimized [schedule_policy] <points> <clusters> <max_iters> <min> <max> <threshold> <seed> <threads> [chunk_size]`
+
+Supported scheduling policies:
+- `static`: pre-distribute iterations evenly (good for balanced workloads)
+- `dynamic`: steal-based scheduling (good for unbalanced workloads)
+- `guided`: hybrid strategy with exponentially decreasing chunk sizes
+
+## Benchmark Automation Framework
+
+A comprehensive benchmarking system automates performance evaluation across multiple configurations.
+
+### Running the Full Benchmark Suite
+
+Execute the automated benchmark suite:
+
+```bash
+./build/kmeans benchmark
+```
+
+This runs:
+- **420+ experiment combinations** across:
+  - Thread counts: 1, 2, 4, 8, 16
+  - Dataset sizes: 100k, 500k, 1M points
+  - Cluster counts: 5, 10, 20, 50
+  - Implementations: sequential, naive, optimized
+  - Scheduling policies: static, dynamic, guided
+  - Chunk sizes: 100, 1000
+
+- **Multi-run statistics** (5 repetitions per configuration) to compute:
+  - Mean runtime
+  - Sample standard deviation
+  - Speedup (sequential baseline / parallel time)
+  - Efficiency (speedup / thread count)
+
+- **Correctness validation** against sequential baseline before collecting results
+
+- **CSV export** with full metrics
+
+### Benchmark Output
+
+The framework produces:
+
+**Console output:** Progress display
+
+```
+[22/120] optimized | guided | Threads=8 | Points=1000000 | Clusters=10 | Chunk=1000
+[23/120] optimized | static | Threads=8 | Points=1000000 | Clusters=10 | Chunk=100
+...
+```
+
+**CSV output:** `benchmark/results/benchmark_results.csv`
+
+Columns:
+- `implementation`: sequential, naive, optimized
+- `schedule`: static, dynamic, guided (N/A for sequential and naive)
+- `chunk_size`: OpenMP chunk size (1000, 10000 etc.)
+- `threads`: thread count (1–16)
+- `points`: dataset size
+- `clusters`: cluster count
+- `iterations`: actual iterations to convergence
+- `runtime_ms`: individual run time
+- `mean_runtime_ms`: average across repetitions
+- `stddev_ms`: sample standard deviation
+- `speedup`: sequential time / parallel time
+- `efficiency`: speedup / thread count
+
+### Example CSV Analysis
+
+Using Python/pandas to analyze results:
+
+```python
+import pandas as pd
+
+df = pd.read_csv('benchmark/results/benchmark_results.csv')
+
+# Filter optimized results on 1M points, 16 threads
+fast = df[(df['implementation'] == 'optimized') & 
+          (df['points'] == 1000000) & 
+          (df['threads'] == 16)]
+
+# Group by scheduling policy and compute aggregate stats
+summary = fast.groupby(['schedule', 'chunk_size']).agg({
+    'mean_runtime_ms': ['min', 'max', 'mean'],
+    'speedup': 'mean',
+    'efficiency': 'mean'
+})
+
+print(summary)
+```
+
+### Customizing the Benchmark
+
+To modify the benchmark grid, edit [src/BenchmarkRunner.cpp](src/BenchmarkRunner.cpp) and adjust:
+
+```cpp
+std::vector<int> threadCounts = {1, 2, 4, 8, 16};
+std::vector<std::size_t> pointCounts = {100000, 500000, 1000000};
+std::vector<int> clusterCounts = {5, 10, 20, 50};
+std::vector<std::string> schedules = {"static", "dynamic", "guided"};
+std::vector<int> chunkSizes = {100, 1000};
+int repetitions = 5;
+```
+
+Then rebuild:
+
+```bash
+cmake --build build -j
+```
+
+### Quick Benchmark (Small Configuration)
+
+For rapid iteration, create a custom small-scale run:
+
+```bash
+# Edit BenchmarkRunner.cpp to use small grid:
+// std::vector<int> threadCounts = {1, 2, 4};
+// std::vector<std::size_t> pointCounts = {100000};
+// std::vector<int> clusterCounts = {5, 10};
+// std::vector<std::string> schedules = {"static"};
+// int repetitions = 2;
+
+./build/kmeans benchmark
+```
+
+This reduces runtime from hours to minutes while maintaining experimental structure.
+
+### Benchmark Design
+
+The framework:
+- **Preserves algorithm implementations** exactly as-is (no modifications to sequential, naive, or optimized logic)
+- **Isolates setup time** (data generation, centroid initialization) from timing measurements
+- **Includes warm-up run** for each configuration to stabilize cache state
+- **Validates correctness** of all implementations using cluster assignment checks
+- **Computes speedup/efficiency** against sequential baseline for direct comparison
+- **Exports reproducible CSV** compatible with Python/pandas/matplotlib
+
+### Performance Considerations
+
+- Full benchmark suite runs ~420 experiments × 5 repetitions = 2100 individual K-Means executions
+- Estimated runtime on typical HPC node: 2–4 hours depending on hardware
+- Suitable for overnight batch jobs or cloud computing
+- Results enable scalability studies and scheduling policy analysis
+- CSV enables histograms, heatmaps, and speedup plots
+

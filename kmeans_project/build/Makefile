@@ -129,6 +129,30 @@ kmeans/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/kmeans.dir/build.make CMakeFiles/kmeans.dir/build
 .PHONY : kmeans/fast
 
+src/BenchmarkRunner.o: src/BenchmarkRunner.cpp.o
+.PHONY : src/BenchmarkRunner.o
+
+# target to build an object file
+src/BenchmarkRunner.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/kmeans.dir/build.make CMakeFiles/kmeans.dir/src/BenchmarkRunner.cpp.o
+.PHONY : src/BenchmarkRunner.cpp.o
+
+src/BenchmarkRunner.i: src/BenchmarkRunner.cpp.i
+.PHONY : src/BenchmarkRunner.i
+
+# target to preprocess a source file
+src/BenchmarkRunner.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/kmeans.dir/build.make CMakeFiles/kmeans.dir/src/BenchmarkRunner.cpp.i
+.PHONY : src/BenchmarkRunner.cpp.i
+
+src/BenchmarkRunner.s: src/BenchmarkRunner.cpp.s
+.PHONY : src/BenchmarkRunner.s
+
+# target to generate assembly for a file
+src/BenchmarkRunner.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/kmeans.dir/build.make CMakeFiles/kmeans.dir/src/BenchmarkRunner.cpp.s
+.PHONY : src/BenchmarkRunner.cpp.s
+
 src/Cluster.o: src/Cluster.cpp.o
 .PHONY : src/Cluster.o
 
@@ -282,6 +306,9 @@ help:
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
 	@echo "... kmeans"
+	@echo "... src/BenchmarkRunner.o"
+	@echo "... src/BenchmarkRunner.i"
+	@echo "... src/BenchmarkRunner.s"
 	@echo "... src/Cluster.o"
 	@echo "... src/Cluster.i"
 	@echo "... src/Cluster.s"

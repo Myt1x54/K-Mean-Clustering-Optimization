@@ -62,17 +62,17 @@ AppConfig parseArguments(int argc, char* argv[]) {
 
     // Flexible argument parsing to support an optional mode string first.
     // Usage patterns supported:
-    // 1) ./kmeans sequential|parallel|both [N] [K] [maxIters] [min] [max] [threshold] [seed] [threads]
+    // 1) ./kmeans sequential|parallel|both|optimized|all|benchmark [N] [K] [maxIters] [min] [max] [threshold] [seed] [threads]
     // 2) ./kmeans N K maxIters [min] [max] [threshold] [seed] [threads]
 
     int idx = 1;
     if (argc > 1) {
         const std::string first(argv[1]);
-        if (first == "sequential" || first == "parallel" || first == "both" || first == "optimized" || first == "all") {
+        if (first == "sequential" || first == "parallel" || first == "both" || first == "optimized" || first == "all" || first == "benchmark") {
             config.mode = first;
             idx = 2; // subsequent args start here
             // If mode indicates scheduling experiments (optimized/all), allow an optional scheduling token next.
-            if (argc > 2) {
+            if (argc > 2 && first != "benchmark") {
                 const std::string second(argv[2]);
                 if (second == "static" || second == "dynamic" || second == "guided") {
                     config.schedulePolicy = second;
@@ -150,10 +150,18 @@ AppConfig parseArguments(int argc, char* argv[]) {
 
 void printUsage(const char* programName) {
     std::cout << "Usage:\n"
-              << "  " << programName << " [num_points] [num_clusters] [max_iterations]"
-              << " [min_coord] [max_coord] [threshold] [seed]\n\n"
+              << "  " << programName << " [mode] [num_points] [num_clusters] [max_iterations]"
+              << " [min_coord] [max_coord] [threshold] [seed] [threads]\n\n"
+              << "Modes:\n"
+              << "  sequential      Run sequential K-Means\n"
+              << "  parallel        Run naive parallel (critical sections)\n"
+              << "  optimized       Run optimized parallel (thread-local accumulators)\n"
+              << "  both            Run sequential then parallel (for comparison)\n"
+              << "  all             Run all implementations with correctness checks\n"
+              << "  benchmark       Run comprehensive benchmark suite\n\n"
               << "Examples:\n"
               << "  " << programName << "\n"
-              << "  " << programName << " 100000 20 100\n"
-              << "  " << programName << " 1000000 32 200 0 5000 1e-5 123\n";
+              << "  " << programName << " sequential 100000 20 100\n"
+              << "  " << programName << " optimized dynamic 1000000 32 200 0 5000 1e-5 123 8 100\n"
+              << "  " << programName << " benchmark\n";
 }

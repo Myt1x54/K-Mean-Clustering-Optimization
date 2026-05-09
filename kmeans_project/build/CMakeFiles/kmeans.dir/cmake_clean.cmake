@@ -1,4 +1,6 @@
 file(REMOVE_RECURSE
+  "CMakeFiles/kmeans.dir/src/BenchmarkRunner.cpp.o"
+  "CMakeFiles/kmeans.dir/src/BenchmarkRunner.cpp.o.d"
   "CMakeFiles/kmeans.dir/src/Cluster.cpp.o"
   "CMakeFiles/kmeans.dir/src/Cluster.cpp.o.d"
   "CMakeFiles/kmeans.dir/src/KMeans.cpp.o"

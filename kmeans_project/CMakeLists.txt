@@ -22,6 +22,7 @@ add_executable(kmeans
     src/KMeans.cpp
     src/Timer.cpp
     src/Utils.cpp
+    src/BenchmarkRunner.cpp
 )
 
 target_include_directories(kmeans PRIVATE include)

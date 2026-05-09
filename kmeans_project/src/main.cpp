@@ -3,6 +3,7 @@
 
 #include "KMeans.h"
 #include "Utils.h"
+#include "BenchmarkRunner.h"
 #ifdef _OPENMP
 #include <omp.h>
 #endif
@@ -11,11 +12,19 @@ int main(int argc, char* argv[]) {
     try {
         const AppConfig config = parseArguments(argc, argv);
 
-        // Determine mode: sequential, parallel (naive), optimized, both, or all
+        // Determine mode: sequential, parallel (naive), optimized, both, all, or benchmark
         const std::string mode = config.mode;
 
-        if (mode != "sequential" && mode != "parallel" && mode != "both" && mode != "optimized" && mode != "all") {
-            throw std::invalid_argument("Mode must be 'sequential', 'parallel', 'optimized', 'both', or 'all'");
+        if (mode != "sequential" && mode != "parallel" && mode != "both" && mode != "optimized" && mode != "all" && mode != "benchmark") {
+            throw std::invalid_argument("Mode must be 'sequential', 'parallel', 'optimized', 'both', 'all', or 'benchmark'");
+        }
+
+        // Handle benchmark mode separately
+        if (mode == "benchmark") {
+            BenchmarkRunner runner;
+            runner.executeFullBenchmark();
+            runner.exportToCSV("/home/myt1x/PDC_Project/kmeans_project/benchmark/results/benchmark_results.csv");
+            return 0;
         }
 
         // Build a reference dataset once to ensure sequential and parallel runs operate on the same input.
