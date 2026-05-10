@@ -167,6 +167,48 @@ CMakeFiles/kmeans.dir/src/BenchmarkRunner.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/kmeans.dir/src/BenchmarkRunner.cpp.s"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/myt1x/PDC_Project/kmeans_project/src/BenchmarkRunner.cpp -o CMakeFiles/kmeans.dir/src/BenchmarkRunner.cpp.s
 
+CMakeFiles/kmeans.dir/src/KMeansSoA.cpp.o: CMakeFiles/kmeans.dir/flags.make
+CMakeFiles/kmeans.dir/src/KMeansSoA.cpp.o: ../src/KMeansSoA.cpp
+CMakeFiles/kmeans.dir/src/KMeansSoA.cpp.o: CMakeFiles/kmeans.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/myt1x/PDC_Project/kmeans_project/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Building CXX object CMakeFiles/kmeans.dir/src/KMeansSoA.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/kmeans.dir/src/KMeansSoA.cpp.o -MF CMakeFiles/kmeans.dir/src/KMeansSoA.cpp.o.d -o CMakeFiles/kmeans.dir/src/KMeansSoA.cpp.o -c /home/myt1x/PDC_Project/kmeans_project/src/KMeansSoA.cpp
+
+CMakeFiles/kmeans.dir/src/KMeansSoA.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/kmeans.dir/src/KMeansSoA.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/myt1x/PDC_Project/kmeans_project/src/KMeansSoA.cpp > CMakeFiles/kmeans.dir/src/KMeansSoA.cpp.i
+
+CMakeFiles/kmeans.dir/src/KMeansSoA.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/kmeans.dir/src/KMeansSoA.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/myt1x/PDC_Project/kmeans_project/src/KMeansSoA.cpp -o CMakeFiles/kmeans.dir/src/KMeansSoA.cpp.s
+
+CMakeFiles/kmeans.dir/src/ProfileRunner.cpp.o: CMakeFiles/kmeans.dir/flags.make
+CMakeFiles/kmeans.dir/src/ProfileRunner.cpp.o: ../src/ProfileRunner.cpp
+CMakeFiles/kmeans.dir/src/ProfileRunner.cpp.o: CMakeFiles/kmeans.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/myt1x/PDC_Project/kmeans_project/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_9) "Building CXX object CMakeFiles/kmeans.dir/src/ProfileRunner.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/kmeans.dir/src/ProfileRunner.cpp.o -MF CMakeFiles/kmeans.dir/src/ProfileRunner.cpp.o.d -o CMakeFiles/kmeans.dir/src/ProfileRunner.cpp.o -c /home/myt1x/PDC_Project/kmeans_project/src/ProfileRunner.cpp
+
+CMakeFiles/kmeans.dir/src/ProfileRunner.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/kmeans.dir/src/ProfileRunner.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/myt1x/PDC_Project/kmeans_project/src/ProfileRunner.cpp > CMakeFiles/kmeans.dir/src/ProfileRunner.cpp.i
+
+CMakeFiles/kmeans.dir/src/ProfileRunner.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/kmeans.dir/src/ProfileRunner.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/myt1x/PDC_Project/kmeans_project/src/ProfileRunner.cpp -o CMakeFiles/kmeans.dir/src/ProfileRunner.cpp.s
+
+CMakeFiles/kmeans.dir/src/ScalabilityRunner.cpp.o: CMakeFiles/kmeans.dir/flags.make
+CMakeFiles/kmeans.dir/src/ScalabilityRunner.cpp.o: ../src/ScalabilityRunner.cpp
+CMakeFiles/kmeans.dir/src/ScalabilityRunner.cpp.o: CMakeFiles/kmeans.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/myt1x/PDC_Project/kmeans_project/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_10) "Building CXX object CMakeFiles/kmeans.dir/src/ScalabilityRunner.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/kmeans.dir/src/ScalabilityRunner.cpp.o -MF CMakeFiles/kmeans.dir/src/ScalabilityRunner.cpp.o.d -o CMakeFiles/kmeans.dir/src/ScalabilityRunner.cpp.o -c /home/myt1x/PDC_Project/kmeans_project/src/ScalabilityRunner.cpp
+
+CMakeFiles/kmeans.dir/src/ScalabilityRunner.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/kmeans.dir/src/ScalabilityRunner.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/myt1x/PDC_Project/kmeans_project/src/ScalabilityRunner.cpp > CMakeFiles/kmeans.dir/src/ScalabilityRunner.cpp.i
+
+CMakeFiles/kmeans.dir/src/ScalabilityRunner.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/kmeans.dir/src/ScalabilityRunner.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/myt1x/PDC_Project/kmeans_project/src/ScalabilityRunner.cpp -o CMakeFiles/kmeans.dir/src/ScalabilityRunner.cpp.s
+
 # Object files for target kmeans
 kmeans_OBJECTS = \
 "CMakeFiles/kmeans.dir/src/main.cpp.o" \
@@ -175,7 +217,10 @@ kmeans_OBJECTS = \
 "CMakeFiles/kmeans.dir/src/KMeans.cpp.o" \
 "CMakeFiles/kmeans.dir/src/Timer.cpp.o" \
 "CMakeFiles/kmeans.dir/src/Utils.cpp.o" \
-"CMakeFiles/kmeans.dir/src/BenchmarkRunner.cpp.o"
+"CMakeFiles/kmeans.dir/src/BenchmarkRunner.cpp.o" \
+"CMakeFiles/kmeans.dir/src/KMeansSoA.cpp.o" \
+"CMakeFiles/kmeans.dir/src/ProfileRunner.cpp.o" \
+"CMakeFiles/kmeans.dir/src/ScalabilityRunner.cpp.o"
 
 # External object files for target kmeans
 kmeans_EXTERNAL_OBJECTS =
@@ -187,11 +232,14 @@ kmeans: CMakeFiles/kmeans.dir/src/KMeans.cpp.o
 kmeans: CMakeFiles/kmeans.dir/src/Timer.cpp.o
 kmeans: CMakeFiles/kmeans.dir/src/Utils.cpp.o
 kmeans: CMakeFiles/kmeans.dir/src/BenchmarkRunner.cpp.o
+kmeans: CMakeFiles/kmeans.dir/src/KMeansSoA.cpp.o
+kmeans: CMakeFiles/kmeans.dir/src/ProfileRunner.cpp.o
+kmeans: CMakeFiles/kmeans.dir/src/ScalabilityRunner.cpp.o
 kmeans: CMakeFiles/kmeans.dir/build.make
 kmeans: /usr/lib/gcc/x86_64-linux-gnu/11/libgomp.so
 kmeans: /usr/lib/x86_64-linux-gnu/libpthread.a
 kmeans: CMakeFiles/kmeans.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/myt1x/PDC_Project/kmeans_project/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Linking CXX executable kmeans"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/myt1x/PDC_Project/kmeans_project/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_11) "Linking CXX executable kmeans"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/kmeans.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.

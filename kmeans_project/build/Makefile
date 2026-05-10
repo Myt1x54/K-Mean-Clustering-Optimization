@@ -201,6 +201,30 @@ src/KMeans.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/kmeans.dir/build.make CMakeFiles/kmeans.dir/src/KMeans.cpp.s
 .PHONY : src/KMeans.cpp.s
 
+src/KMeansSoA.o: src/KMeansSoA.cpp.o
+.PHONY : src/KMeansSoA.o
+
+# target to build an object file
+src/KMeansSoA.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/kmeans.dir/build.make CMakeFiles/kmeans.dir/src/KMeansSoA.cpp.o
+.PHONY : src/KMeansSoA.cpp.o
+
+src/KMeansSoA.i: src/KMeansSoA.cpp.i
+.PHONY : src/KMeansSoA.i
+
+# target to preprocess a source file
+src/KMeansSoA.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/kmeans.dir/build.make CMakeFiles/kmeans.dir/src/KMeansSoA.cpp.i
+.PHONY : src/KMeansSoA.cpp.i
+
+src/KMeansSoA.s: src/KMeansSoA.cpp.s
+.PHONY : src/KMeansSoA.s
+
+# target to generate assembly for a file
+src/KMeansSoA.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/kmeans.dir/build.make CMakeFiles/kmeans.dir/src/KMeansSoA.cpp.s
+.PHONY : src/KMeansSoA.cpp.s
+
 src/Point.o: src/Point.cpp.o
 .PHONY : src/Point.o
 
@@ -224,6 +248,54 @@ src/Point.s: src/Point.cpp.s
 src/Point.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/kmeans.dir/build.make CMakeFiles/kmeans.dir/src/Point.cpp.s
 .PHONY : src/Point.cpp.s
+
+src/ProfileRunner.o: src/ProfileRunner.cpp.o
+.PHONY : src/ProfileRunner.o
+
+# target to build an object file
+src/ProfileRunner.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/kmeans.dir/build.make CMakeFiles/kmeans.dir/src/ProfileRunner.cpp.o
+.PHONY : src/ProfileRunner.cpp.o
+
+src/ProfileRunner.i: src/ProfileRunner.cpp.i
+.PHONY : src/ProfileRunner.i
+
+# target to preprocess a source file
+src/ProfileRunner.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/kmeans.dir/build.make CMakeFiles/kmeans.dir/src/ProfileRunner.cpp.i
+.PHONY : src/ProfileRunner.cpp.i
+
+src/ProfileRunner.s: src/ProfileRunner.cpp.s
+.PHONY : src/ProfileRunner.s
+
+# target to generate assembly for a file
+src/ProfileRunner.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/kmeans.dir/build.make CMakeFiles/kmeans.dir/src/ProfileRunner.cpp.s
+.PHONY : src/ProfileRunner.cpp.s
+
+src/ScalabilityRunner.o: src/ScalabilityRunner.cpp.o
+.PHONY : src/ScalabilityRunner.o
+
+# target to build an object file
+src/ScalabilityRunner.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/kmeans.dir/build.make CMakeFiles/kmeans.dir/src/ScalabilityRunner.cpp.o
+.PHONY : src/ScalabilityRunner.cpp.o
+
+src/ScalabilityRunner.i: src/ScalabilityRunner.cpp.i
+.PHONY : src/ScalabilityRunner.i
+
+# target to preprocess a source file
+src/ScalabilityRunner.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/kmeans.dir/build.make CMakeFiles/kmeans.dir/src/ScalabilityRunner.cpp.i
+.PHONY : src/ScalabilityRunner.cpp.i
+
+src/ScalabilityRunner.s: src/ScalabilityRunner.cpp.s
+.PHONY : src/ScalabilityRunner.s
+
+# target to generate assembly for a file
+src/ScalabilityRunner.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/kmeans.dir/build.make CMakeFiles/kmeans.dir/src/ScalabilityRunner.cpp.s
+.PHONY : src/ScalabilityRunner.cpp.s
 
 src/Timer.o: src/Timer.cpp.o
 .PHONY : src/Timer.o
@@ -315,9 +387,18 @@ help:
 	@echo "... src/KMeans.o"
 	@echo "... src/KMeans.i"
 	@echo "... src/KMeans.s"
+	@echo "... src/KMeansSoA.o"
+	@echo "... src/KMeansSoA.i"
+	@echo "... src/KMeansSoA.s"
 	@echo "... src/Point.o"
 	@echo "... src/Point.i"
 	@echo "... src/Point.s"
+	@echo "... src/ProfileRunner.o"
+	@echo "... src/ProfileRunner.i"
+	@echo "... src/ProfileRunner.s"
+	@echo "... src/ScalabilityRunner.o"
+	@echo "... src/ScalabilityRunner.i"
+	@echo "... src/ScalabilityRunner.s"
 	@echo "... src/Timer.o"
 	@echo "... src/Timer.i"
 	@echo "... src/Timer.s"

@@ -1,0 +1,19 @@
+
+ Performance counter stats for './build/kmeans soa static 50000 10 100 0 1000 1e-4 42 4 1000':
+
+             46626      cache-misses:u            #    2.313 % of all cache refs    
+           2015872      cache-references:u        #   10.488 M/sec                  
+        1159128265      instructions:u            #    2.03  insn per cycle         
+         571567252      cycles:u                  #    2.974 GHz                    
+            192.20 msec task-clock:u              #    3.528 CPUs utilized          
+         190619501      branches:u                #  991.765 M/sec                  
+            258613      branch-misses:u           #    0.14% of all branches        
+                 0      context-switches:u        #    0.000 /sec                   
+               980      page-faults:u             #    5.099 K/sec                  
+
+       0.054485385 seconds time elapsed
+
+       0.177847000 seconds user
+       0.003866000 seconds sys
+
+

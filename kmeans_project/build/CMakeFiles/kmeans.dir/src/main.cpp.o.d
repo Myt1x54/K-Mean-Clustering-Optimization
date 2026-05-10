@@ -150,7 +150,12 @@ CMakeFiles/kmeans.dir/src/main.cpp.o: \
  /usr/include/c++/11/bits/locale_facets.tcc \
  /usr/include/c++/11/bits/basic_ios.tcc \
  /usr/include/c++/11/bits/ostream.tcc /usr/include/c++/11/istream \
- /usr/include/c++/11/bits/istream.tcc \
+ /usr/include/c++/11/bits/istream.tcc /usr/include/c++/11/sstream \
+ /usr/include/c++/11/bits/sstream.tcc /usr/include/c++/11/vector \
+ /usr/include/c++/11/bits/stl_uninitialized.h \
+ /usr/include/c++/11/bits/stl_vector.h \
+ /usr/include/c++/11/bits/stl_bvector.h \
+ /usr/include/c++/11/bits/vector.tcc \
  /home/myt1x/PDC_Project/kmeans_project/include/KMeans.h \
  /usr/include/c++/11/random /usr/include/c++/11/cmath /usr/include/math.h \
  /usr/include/x86_64-linux-gnu/bits/math-vector.h \
@@ -175,11 +180,7 @@ CMakeFiles/kmeans.dir/src/main.cpp.o: \
  /usr/include/c++/11/tr1/poly_hermite.tcc \
  /usr/include/c++/11/tr1/poly_laguerre.tcc \
  /usr/include/c++/11/tr1/riemann_zeta.tcc \
- /usr/include/c++/11/bits/random.h /usr/include/c++/11/vector \
- /usr/include/c++/11/bits/stl_uninitialized.h \
- /usr/include/c++/11/bits/stl_vector.h \
- /usr/include/c++/11/bits/stl_bvector.h \
- /usr/include/c++/11/bits/vector.tcc \
+ /usr/include/c++/11/bits/random.h \
  /usr/include/c++/11/bits/uniform_int_dist.h \
  /usr/include/x86_64-linux-gnu/c++/11/bits/opt_random.h \
  /usr/include/c++/11/bits/random.tcc /usr/include/c++/11/numeric \
@@ -188,7 +189,19 @@ CMakeFiles/kmeans.dir/src/main.cpp.o: \
  /usr/include/c++/11/pstl/execution_defs.h \
  /home/myt1x/PDC_Project/kmeans_project/include/Cluster.h \
  /home/myt1x/PDC_Project/kmeans_project/include/Point.h \
+ /home/myt1x/PDC_Project/kmeans_project/include/KMeansSoA.h \
  /home/myt1x/PDC_Project/kmeans_project/include/Utils.h \
  /usr/include/c++/11/cstddef \
  /home/myt1x/PDC_Project/kmeans_project/include/BenchmarkRunner.h \
+ /home/myt1x/PDC_Project/kmeans_project/src/ProfileRunner.h \
+ /usr/include/c++/11/map /usr/include/c++/11/bits/stl_tree.h \
+ /usr/include/c++/11/ext/aligned_buffer.h \
+ /usr/include/c++/11/bits/node_handle.h \
+ /usr/include/c++/11/bits/stl_map.h /usr/include/c++/11/tuple \
+ /usr/include/c++/11/utility /usr/include/c++/11/bits/stl_relops.h \
+ /usr/include/c++/11/array /usr/include/c++/11/bits/uses_allocator.h \
+ /usr/include/c++/11/bits/invoke.h \
+ /usr/include/c++/11/bits/stl_multimap.h \
+ /usr/include/c++/11/bits/erase_if.h \
+ /home/myt1x/PDC_Project/kmeans_project/src/ScalabilityRunner.h \
  /usr/lib/gcc/x86_64-linux-gnu/11/include/omp.h

@@ -23,6 +23,9 @@ add_executable(kmeans
     src/Timer.cpp
     src/Utils.cpp
     src/BenchmarkRunner.cpp
+    src/KMeansSoA.cpp
+    src/ProfileRunner.cpp
+    src/ScalabilityRunner.cpp
 )
 
 target_include_directories(kmeans PRIVATE include)

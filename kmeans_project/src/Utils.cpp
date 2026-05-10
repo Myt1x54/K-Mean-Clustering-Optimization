@@ -68,7 +68,7 @@ AppConfig parseArguments(int argc, char* argv[]) {
     int idx = 1;
     if (argc > 1) {
         const std::string first(argv[1]);
-        if (first == "sequential" || first == "parallel" || first == "both" || first == "optimized" || first == "all" || first == "benchmark") {
+        if (first == "sequential" || first == "parallel" || first == "both" || first == "optimized" || first == "soa" || first == "all" || first == "benchmark") {
             config.mode = first;
             idx = 2; // subsequent args start here
             // If mode indicates scheduling experiments (optimized/all), allow an optional scheduling token next.
@@ -156,12 +156,15 @@ void printUsage(const char* programName) {
               << "  sequential      Run sequential K-Means\n"
               << "  parallel        Run naive parallel (critical sections)\n"
               << "  optimized       Run optimized parallel (thread-local accumulators)\n"
+              << "  soa             Run memory-optimized SoA parallel implementation\n"
               << "  both            Run sequential then parallel (for comparison)\n"
               << "  all             Run all implementations with correctness checks\n"
-              << "  benchmark       Run comprehensive benchmark suite\n\n"
+              << "  benchmark       Run comprehensive benchmark suite\n"
+              << "  scalability     Run scalability, IPC, and Roofline analysis\n\n"
               << "Examples:\n"
               << "  " << programName << "\n"
               << "  " << programName << " sequential 100000 20 100\n"
               << "  " << programName << " optimized dynamic 1000000 32 200 0 5000 1e-5 123 8 100\n"
-              << "  " << programName << " benchmark\n";
+              << "  " << programName << " benchmark\n"
+              << "  " << programName << " scalability optimized,soa 50000,100000 10 1000 3\n";
 }

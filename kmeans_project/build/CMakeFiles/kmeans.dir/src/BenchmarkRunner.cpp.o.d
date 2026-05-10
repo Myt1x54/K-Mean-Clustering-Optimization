@@ -221,4 +221,5 @@ CMakeFiles/kmeans.dir/src/BenchmarkRunner.cpp.o: \
  /usr/include/x86_64-linux-gnu/c++/11/bits/opt_random.h \
  /usr/include/c++/11/bits/random.tcc \
  /home/myt1x/PDC_Project/kmeans_project/include/Cluster.h \
- /home/myt1x/PDC_Project/kmeans_project/include/Point.h
+ /home/myt1x/PDC_Project/kmeans_project/include/Point.h \
+ /home/myt1x/PDC_Project/kmeans_project/include/KMeansSoA.h

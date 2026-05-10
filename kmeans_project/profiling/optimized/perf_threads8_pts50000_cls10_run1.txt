@@ -1,0 +1,19 @@
+
+ Performance counter stats for './build/kmeans optimized static 50000 10 100 0 1000 1e-4 42 8 1000':
+
+             61334      cache-misses:u            #    0.251 % of all cache refs    
+          24440192      cache-references:u        #   37.037 M/sec                  
+        1250650720      instructions:u            #    0.68  insn per cycle         
+        1842114898      cycles:u                  #    2.792 GHz                    
+            659.89 msec task-clock:u              #    7.441 CPUs utilized          
+         219944893      branches:u                #  333.307 M/sec                  
+            176571      branch-misses:u           #    0.08% of all branches        
+                 0      context-switches:u        #    0.000 /sec                   
+              1038      page-faults:u             #    1.573 K/sec                  
+
+       0.088685081 seconds time elapsed
+
+       0.653564000 seconds user
+       0.000000000 seconds sys
+
+

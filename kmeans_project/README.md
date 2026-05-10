@@ -362,3 +362,280 @@ The framework:
 - Results enable scalability studies and scheduling policy analysis
 - CSV enables histograms, heatmaps, and speedup plots
 
+## Memory-Optimized SoA Implementation
+
+This project now includes a memory-optimized implementation that uses a Structure-of-Arrays (SoA) layout to improve memory locality and cache utilization.
+
+Key points:
+- The new implementation is provided as a separate class `KMeansSoA` and source `src/KMeansSoA.cpp`.
+- Internal layout uses contiguous arrays: `std::vector<double> xs`, `std::vector<double> ys`, and `std::vector<int> clusters`.
+- Thread-local accumulators use padded per-thread strides to reduce false sharing (`stride = K + padding`).
+- OpenMP scheduling is supported via `omp_set_schedule()` and `schedule(runtime)` so policies (`static`, `dynamic`, `guided`) can be tested at runtime.
+
+How to run the SoA memory-optimized implementation via the benchmark suite:
+
+1. Rebuild:
+
+```bash
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+cmake --build build -j
+```
+
+2. Run the benchmark suite (includes SoA):
+
+```bash
+./build/kmeans benchmark
+```
+
+3. The `benchmark` mode includes `soa` in the implementation list so results for SoA will appear in `benchmark/results/benchmark_results.csv` where `implementation` equals `soa`.
+
+Notes on correctness and comparison:
+- The SoA implementation is independent from the existing AoS `KMeans` code and does not modify it.
+- The benchmark framework validates SoA results before recording them.
+- Use the CSV export to compare `soa` against `sequential`, `naive`, and `optimized` rows.
+
+Rationale (AoS vs SoA):
+- AoS (Array-of-Structures) is convenient but can hamper vectorized loads and contiguous memory access for hot fields (x and y).
+- SoA (Structure-of-Arrays) stores each field contiguously which improves spatial locality when scanning coordinates, and reduces cache misses when processing one field at a time.
+- SoA is often a better starting point for future SIMD/vectorization and hardware profiling.
+
+## Profiling with `perf` (Hardware-Level Metrics)
+
+This project now includes a lightweight profiling integration using Linux `perf` to collect hardware-level metrics for detailed bottleneck analysis (cache, instructions, cycles, IPC, synchronization).
+
+Files added:
+- `src/ProfileRunner.h` / `src/ProfileRunner.cpp` — C++ helper that runs `perf stat` against the local `kmeans` binary, parses selected metrics, and writes `profiling/profiling_results.csv`.
+- `scripts/profile_runner.sh` — simple shell wrapper for ad-hoc profiling runs.
+
+### WSL perf workaround
+
+On WSL, the generic `/usr/bin/perf` wrapper can fail with a kernel-mismatch error even when a working kernel-specific binary exists under `/usr/lib/linux-tools/.../perf`.
+
+This project now resolves a usable binary automatically by searching:
+- `PERF_BIN` if set
+- `/usr/lib/linux-tools/**/perf`
+- fallback generic `perf` only if no kernel-matched binary is found
+
+If you already know the working binary, set it explicitly:
+
+```bash
+export PERF_BIN=/usr/lib/linux-tools/5.15.0-177-generic/perf
+./build/kmeans profile optimized 8 50000 10 static 1000
+```
+
+The helper script also supports the same override:
+
+```bash
+PERF_BIN=/usr/lib/linux-tools/5.15.0-177-generic/perf ./scripts/profile_runner.sh optimized 8 50000 10 static 1000
+```
+
+Quick usage (ad-hoc):
+
+```bash
+# Run optimized implementation under perf (8 threads)
+./scripts/profile_runner.sh optimized 8 100000 10 static 1000
+```
+
+CLI profiling mode:
+
+You can also run profiling directly via the binary:
+
+```bash
+./build/kmeans profile optimized 8 100000 10 static 1000
+```
+
+This runs `perf stat -e cache-misses,cache-references,instructions,cycles,task-clock,branches,branch-misses,context-switches,page-faults` and stores raw output under `profiling/<implementation>/` and a CSV summary at `profiling/profiling_results.csv`.
+
+CPU utilization is derived from `task-clock` and elapsed time, so it still appears in the CSV summary even though it is not passed as a raw perf event.
+
+Under the hood, profiling invocations now use `${PERF_BIN} stat ...` rather than hardcoding `perf stat ...`.
+
+CSV columns include:
+- `implementation,threads,schedule,points,clusters,runtime_ms,cache_misses,cache_references,cache_miss_rate,instructions,cycles,ipc,cpu_utilization`
+
+Interpretation:
+- `ipc = instructions / cycles` indicates instruction throughput — low IPC with high CPU utilization may indicate memory stalls.
+- `cache_miss_rate = cache_misses / cache_references` indicates cache pressure.
+- Compare `soa` vs `optimized` to observe reduced cache misses and improved IPC for SoA at higher thread counts.
+
+Notes:
+- Profiling is optional and separate from normal benchmarking.
+- The profiling integration intentionally does not change algorithm code or timing collection.
+- Future work: `perf record` flamegraphs, Roofline model helper, LIKWID/VTune adapters (not implemented here).
+
+## Scalability and Roofline Analysis
+
+The project now includes a separate scalability analysis path for final report evaluation. It keeps the benchmark and profiling flows intact while exporting report-ready scalability and Roofline data.
+
+### Run Scalability Experiments
+
+Default scalability run:
+
+```bash
+./build/kmeans scalability
+```
+
+Select implementations and dataset settings:
+
+```bash
+./build/kmeans scalability optimized,soa 50000,100000 10 1000 3
+```
+
+Environment overrides:
+
+```bash
+SCAL_THREADS=1,2,4,8,16 \
+SCAL_SCHEDULES=static,dynamic,guided \
+SCAL_CHUNKS=100,1000 \
+SCAL_OUTDIR=report \
+SCAL_PROFILING_CSV=profiling/profiling_results.csv \
+./build/kmeans scalability
+```
+
+The runner automatically caps thread counts to the detected hardware limit when requested.
+
+### Generated Outputs
+
+Scalability analysis writes:
+- `report/scalability_results.csv`
+- `report/roofline_metrics.csv`
+- `report/tables/scalability_summary.md`
+- `report/tables/roofline_summary.md`
+- figures in `report/figures/`
+
+Generate plots from the CSV outputs:
+
+```bash
+python3 scripts/generate_scalability_plots.py
+```
+
+Generate assets with custom output directory, figure formats, and resolution:
+
+```bash
+python3 scripts/generate_scalability_plots.py \
+  --input-csv report/scalability_results.csv \
+  --outdir report \
+  --figures-subdir figures \
+  --tables-subdir tables \
+  --dpi 350 \
+  --formats png,pdf
+```
+
+Typical figures:
+- `runtime_scaling.png` / `runtime_threads.png`
+- `runtime_dataset_size.png`
+- `runtime_clusters.png`
+- `speedup_scaling.png`
+- `speedup_comparison.png`
+- `efficiency_scaling.png`
+- `efficiency_comparison.png`
+- `ipc_scaling.png`
+- `cache_behavior.png`
+- `scheduling_runtime.png`
+- `scheduling_speedup.png`
+- `scheduling_comparison.png`
+- `scalability_plot.png`
+- `roofline_plot.png`
+- `roofline_analysis.png`
+- `arithmetic_intensity.png`
+- `scalability_summary.png`
+
+Presentation-oriented figure set:
+- `presentation_scalability_overview.png`
+
+All figures are exported in each requested format (for example `png` and `pdf`) to support both report insertion and slide decks.
+
+### Final Report and Table Exports
+
+The visualization script now writes report-ready summaries in CSV, Markdown, and LaTeX:
+
+CSV summaries:
+- `report/final_runtime_summary.csv`
+- `report/final_speedup_summary.csv`
+- `report/final_efficiency_summary.csv`
+- `report/final_hardware_summary.csv`
+- `report/final_roofline_summary.csv`
+- `report/cache_analysis.csv`
+- `report/ipc_analysis.csv`
+- `report/comparison_table_presentation.csv`
+
+Markdown/LaTeX tables:
+- `report/tables/scalability_summary.md` and `.tex`
+- `report/tables/roofline_summary.md` and `.tex`
+- `report/tables/hardware_summary.md` and `.tex`
+- `report/tables/final_comparison_summary.md` and `.tex`
+- `report/tables/analysis_summary.md`
+
+The generated analysis summary highlights:
+- naive OpenMP synchronization bottlenecks
+- optimized thread-local reduction gains
+- SoA locality and IPC behavior
+- likely hardware limits (memory bandwidth and cache pressure)
+
+### Formulas
+
+Speedup and efficiency are computed as:
+
+$$
+Speedup(T) = \frac{Runtime_{sequential}}{Runtime_T}
+$$
+
+$$
+Efficiency(T) = \frac{Speedup(T)}{T}
+$$
+
+Arithmetic intensity is estimated as:
+
+$$
+AI = \frac{FLOPs}{Bytes\ Accessed}
+$$
+
+For report analysis, the code exports approximate Roofline-ready metrics using measured runtime, IPC, cache miss rate, achieved GFLOP/s, and an estimated bandwidth proxy. The SoA layout is modeled with better effective locality than AoS, which increases the estimated AI and usually improves achieved performance at higher thread counts.
+
+Runtime, speedup, and efficiency charts are generated across:
+- thread counts
+- dataset sizes (`points`)
+- cluster counts (`clusters`)
+
+Scheduling comparisons are generated across:
+- OpenMP schedules (`static`, `dynamic`, `guided`)
+- chunk sizes
+- thread counts
+
+### Interpretation Guide
+
+- Naive OpenMP is synchronization-bound because `critical` sections serialize the hot path.
+- Optimized OpenMP removes the lock bottleneck, so memory traffic and cache pressure become the main limits.
+- SoA improves locality and reduces cache waste, which usually raises IPC and improves scalability.
+- Scaling eventually plateaus when memory bandwidth, shared-cache pressure, or OpenMP runtime overhead dominates.
+- Roofline plots help explain whether a run is compute-bound or memory-bound by comparing achieved performance to the estimated bandwidth and compute ceilings.
+
+### ERT / Roofline Tooling
+
+If an Empirical Roofline Tool is available on your system, you can plug it into the same `report/` workflow later. The current implementation does not require ERT and falls back to a simplified empirical Roofline using the measured profiling data already exported by this project.
+
+### WSL Notes
+
+On WSL, use a kernel-matched perf binary when needed:
+
+```bash
+export PERF_BIN=/usr/lib/linux-tools/5.15.0-177-generic/perf
+./build/kmeans profile optimized 8 50000 10 static 1000
+./build/kmeans scalability
+```
+
+The profiling runner now auto-detects `PERF_BIN` and will search `/usr/lib/linux-tools/**/perf` before falling back.
+
+## Visualization Extensibility Notes
+
+The plotting/export pipeline is intentionally modular and additive so future work can extend outputs without changing core K-Means implementations. Planned extension points include:
+- SIMD comparison overlays
+- GPU kernel result overlays
+- MPI/distributed scaling views
+- NUMA-aware hardware comparison panels
+
+These extensions are not implemented in this phase.
+
+
+This SoA variant preserves algorithm logic and correctness while improving memory locality and reducing false sharing via padding.
+

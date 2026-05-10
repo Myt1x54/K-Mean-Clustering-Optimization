@@ -8,6 +8,7 @@
 #include <numeric>
 
 #include "KMeans.h"
+#include "KMeansSoA.h"
 
 BenchmarkRunner::BenchmarkRunner()
     : sequentialBaseline_(0.0), totalExperiments_(0), currentExperiment_(0) {}
@@ -21,7 +22,7 @@ void BenchmarkRunner::executeFullBenchmark() {
     std::vector<int> threadCounts = {1, 2, 4, 8, 16};
     std::vector<std::size_t> pointCounts = {100000, 500000, 1000000};
     std::vector<int> clusterCounts = {5, 10, 20, 50};
-    std::vector<std::string> implementations = {"sequential", "naive", "optimized"};
+    std::vector<std::string> implementations = {"sequential", "naive", "optimized", "soa"};
     std::vector<std::string> schedules = {"static", "dynamic", "guided"};
     std::vector<int> chunkSizes = {100, 1000};
     int maxIterations = 100;
@@ -152,6 +153,10 @@ void BenchmarkRunner::runSingleExperiment(const ExperimentConfig& config, Benchm
             warmup.runParallel(config.threadCount, config.chunkSize);
         } else if (config.implementation == "optimized") {
             warmup.runParallelOptimized(config.threadCount, config.chunkSize, config.schedulePolicy);
+        } else if (config.implementation == "soa") {
+            KMeansSoA warmup_soa(config.numClusters, config.maxIterations, config.convergenceThreshold, config.randomSeed);
+            warmup_soa.generateRandomPoints(config.numPoints, 0.0, 1000.0);
+            warmup_soa.runParallelMemoryOptimized(config.threadCount, config.chunkSize, config.schedulePolicy);
         }
     }
 
@@ -166,6 +171,22 @@ void BenchmarkRunner::runSingleExperiment(const ExperimentConfig& config, Benchm
             kmeans.runParallel(config.threadCount, config.chunkSize);
         } else if (config.implementation == "optimized") {
             kmeans.runParallelOptimized(config.threadCount, config.chunkSize, config.schedulePolicy);
+        } else if (config.implementation == "soa") {
+            KMeansSoA ksoa(config.numClusters, config.maxIterations, config.convergenceThreshold, config.randomSeed + rep);
+            ksoa.generateRandomPoints(config.numPoints, 0.0, 1000.0);
+            ksoa.runParallelMemoryOptimized(config.threadCount, config.chunkSize, config.schedulePolicy);
+
+            // Record SoA results
+            result.runtimes_ms.push_back(ksoa.getTotalRuntimeMs());
+            result.iterationsExecuted = ksoa.getIterationsExecuted();
+            result.converged = (result.iterationsExecuted < config.maxIterations);
+            if (!ksoa.validateAssignments()) {
+                std::cerr << "WARNING: Validation failed for soa\n";
+                result.correctnessValidated = false;
+            } else {
+                result.correctnessValidated = true;
+            }
+            continue; // skip remaining KMeans-based recording
         }
 
         // Validate correctness
